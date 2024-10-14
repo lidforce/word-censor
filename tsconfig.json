@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "es2022", // Версия ECMAScript
+    "module": "Node16", // Модульная система
+    "moduleResolution": "Node16",
+    "rootDir": "./src", // Директория исходников
+    "outDir": "./dist/src", // Директория для выходных файлов
+    "strict": true, // Включить строгий режим
+    "esModuleInterop": true, // Совместимость с CommonJS
+    "skipLibCheck": true, // Пропуск проверки библиотек
+    "forceConsistentCasingInFileNames": true, // Последовательность имен файлов
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "declaration": true,
+    "noImplicitAny": false,
+    "removeComments": false,
+    "noLib": false,
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts"
+  ]
+}

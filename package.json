@@ -1,0 +1,24 @@
+{
+  "name": "word-censor",
+  "version": "0.0.1",
+  "description": "word-censor by @lid_force",
+  "main": "./src/index.ts",
+  "private": true,
+  "type": "module",
+  "node": ">=18",
+
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start:dev": "ts-node --respawn src/index.ts",
+    "build:start": "npm run build && npm run start",
+    "start": "node dist/src/index.js"
+  },
+  "author": "Lid Force",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.7.5",
+    "ts-node-dev": "^2.0.0",
+    "tsx": "^3.12.7",
+    "typescript": "^5.6.3"
+  }
+}
