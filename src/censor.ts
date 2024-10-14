@@ -4,32 +4,46 @@ import { ruWordList } from './lang/ru.js';
 export class Censor {
   private language: string;
   private wordList: string[];
-  private sensitivity: number;
+  private sensitivity?: number;
   private symbol: string;
+  private rigidMode: boolean;
 
-  constructor(options: Partial<CensorOptions> = {}) {
+  constructor(options: CensorOptions) {
     this.language = options.language || 'ru';
     this.wordList = options.wordList || ruWordList;
-    this.sensitivity = options.sensitivity || 0; // Чувствительность по умолчанию 0
     this.symbol = options.symbol || '*';
+    this.rigidMode = options.rigidMode ?? false;
+
+    if (this.rigidMode && 'sensitivity' in options) {
+      this.sensitivity = options.sensitivity;
+    } else {
+      this.sensitivity = 0;
+    }
   }
 
-  // Установка языка, списка слов и чувствительности
-  public setOptions(options: Partial<CensorOptions>): void {
+  public setOptions(options: CensorOptions): void {
     if (options.language) this.language = options.language;
     if (options.wordList) this.wordList = options.wordList;
-    if (options.sensitivity !== undefined) this.sensitivity = options.sensitivity;
+
+    if (options.rigidMode !== undefined) {
+      this.rigidMode = options.rigidMode;
+    }
+
+    if (this.rigidMode && 'sensitivity' in options) {
+      this.sensitivity = options.sensitivity;
+    } else {
+      this.sensitivity = 0;
+    }
   }
 
   private normalizeText(text: string): string {
     return text
       .replace(/[Aa@4/\-\\]/g, 'а')
       .replace(/[Bb6]/g, 'б')
-      .replace(/[VvB8]/g, 'в')
+      .replace(/[VvWwB8]/g, 'в')
       .replace(/[Gg]/g, 'г')
       .replace(/[Dd]/g, 'д')
       .replace(/[Ee3]/g, 'е')
-      .replace(/[Ee3]/g, 'ё')
       .replace(/[\*\}\{><]/g, 'ж')
       .replace(/[Zz3]/g, 'з')
       .replace(/[Ii!1]/g, 'и')
@@ -62,38 +76,57 @@ export class Censor {
       .replace(/[0]/g, 'o');
   }
 
-  private createRegexForWord(word: string): RegExp {
-    // Определим символы маскировки, которые могут быть использованы между буквами
-    const maskSymbols = `[\\*@$#!%&0-9]`; 
-  
-    // Чувствительность: сколько символов маскировки может быть между буквами
-    const pattern = word
-      .split('')
-      .map((char) => `${char}${maskSymbols}{0,${this.sensitivity}}`)
-      .join('');
-  
-    // Создаем регулярное выражение с учетом чувствительности
-    const regex = new RegExp(pattern, 'gi');
-    return regex;
+  // Метод проверки совпадений по словам
+  private checkWordMatch(word: string, textWord: string): boolean {
+    if (this.rigidMode) {
+      // В rigidMode проверяем совпадение символов с учётом чувствительности
+      const normalizedWord = word.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); // Нормализуем для корректного сравнения
+      const maskedWord = textWord.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+      return this.compareWordsWithSensitivity(normalizedWord, maskedWord);
+    } else {
+      // Если rigidMode выключен, проверяем полное совпадение слова
+      return word === textWord;
+    }
   }
+
+  // Функция сравнения слов с учётом чувствительности
+  private compareWordsWithSensitivity(word: string, maskedWord: string): boolean {
+    const sensitivity = this.sensitivity ?? 0; // Устанавливаем значение по умолчанию для чувствительности
+  
+    let mismatchCount = 0;
+  
+    for (let i = 0; i < word.length; i++) {
+      if (word[i] !== maskedWord[i]) {
+        mismatchCount++;
+        if (mismatchCount > sensitivity) {
+          return false;
+        }
+      }
+    }
+  
+    return true;
+  }
+  
 
   public find(text: string): DetectionResult {
     const normalizedText = this.normalizeText(text);
     let censoredText = normalizedText;
 
-    this.wordList.forEach((word) => {
-      const regex = this.createRegexForWord(word);
+    const words = normalizedText.split(/\s+/); // Разделяем текст на слова по пробелам
 
-      // Важно: Заменяем только найденные матные слова, без захвата лишних частей текста
-      censoredText = censoredText.replace(regex, (match) => this.symbol.repeat(match.length));
+    const censoredWords = words.map((textWord) => {
+      const wordFound = this.wordList.some((badWord) => this.checkWordMatch(badWord, textWord));
+      return wordFound ? this.symbol.repeat(textWord.length) : textWord;
     });
+
+    censoredText = censoredWords.join(' ');
 
     return {
       hasProfanity: censoredText !== normalizedText,
       censoredText: censoredText,
     };
   }
-
 
   public detect(text: string): boolean {
     const result = this.find(text);
