@@ -1,14 +1,14 @@
 {
   "compilerOptions": {
-    "target": "es2022", // Версия ECMAScript
-    "module": "Node16", // Модульная система
+    "target": "es2022",
+    "module": "Node16",
     "moduleResolution": "Node16",
-    "rootDir": "./src", // Директория исходников
-    "outDir": "./dist/src", // Директория для выходных файлов
-    "strict": true, // Включить строгий режим
-    "esModuleInterop": true, // Совместимость с CommonJS
-    "skipLibCheck": true, // Пропуск проверки библиотек
-    "forceConsistentCasingInFileNames": true, // Последовательность имен файлов
+    "rootDir": "./src",
+    "outDir": "./dist/src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "declaration": true,
