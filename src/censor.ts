@@ -76,26 +76,22 @@ export class Censor {
       .replace(/[0]/g, 'o');
   }
 
-  // Метод проверки совпадений по словам
   private checkWordMatch(word: string, textWord: string): boolean {
     if (this.rigidMode) {
-      // В rigidMode проверяем совпадение символов с учётом чувствительности
-      const normalizedWord = word.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); // Нормализуем для корректного сравнения
+      const normalizedWord = word.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
       const maskedWord = textWord.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
       return this.compareWordsWithSensitivity(normalizedWord, maskedWord);
     } else {
-      // Если rigidMode выключен, проверяем полное совпадение слова
       return word === textWord;
     }
   }
 
-  // Функция сравнения слов с учётом чувствительности
   private compareWordsWithSensitivity(word: string, maskedWord: string): boolean {
-    const sensitivity = this.sensitivity ?? 0; // Устанавливаем значение по умолчанию для чувствительности
-  
+    const sensitivity = this.sensitivity ?? 0;
+
     let mismatchCount = 0;
-  
+
     for (let i = 0; i < word.length; i++) {
       if (word[i] !== maskedWord[i]) {
         mismatchCount++;
@@ -104,16 +100,16 @@ export class Censor {
         }
       }
     }
-  
+
     return true;
   }
-  
+
 
   public find(text: string): DetectionResult {
     const normalizedText = this.normalizeText(text);
     let censoredText = normalizedText;
 
-    const words = normalizedText.split(/\s+/); // Разделяем текст на слова по пробелам
+    const words = normalizedText.split(/\s+/);
 
     const censoredWords = words.map((textWord) => {
       const wordFound = this.wordList.some((badWord) => this.checkWordMatch(badWord, textWord));

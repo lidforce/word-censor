@@ -1,4 +1,3 @@
-// Определяем опции для rigidMode = false (без чувствительности)
 interface CensorOptionsWithoutSensitivity {
   language?: string;
   wordList?: string[];
@@ -6,7 +5,6 @@ interface CensorOptionsWithoutSensitivity {
   rigidMode?: false;
 }
 
-// Определяем опции для rigidMode = true (с поддержкой чувствительности)
 interface CensorOptionsWithSensitivity {
   language?: string;
   wordList?: string[];
@@ -15,7 +13,6 @@ interface CensorOptionsWithSensitivity {
   sensitivity?: number;
 }
 
-// Унифицированный тип CensorOptions, который будет либо с rigidMode = false, либо с rigidMode = true
 export type CensorOptions = CensorOptionsWithoutSensitivity | CensorOptionsWithSensitivity;
 
 

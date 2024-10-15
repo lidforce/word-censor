@@ -3,10 +3,12 @@
   "version": "0.0.1",
   "description": "word-censor by @lid_force",
   "main": "./src/index.ts",
-  "private": true,
   "type": "module",
   "node": ">=18",
-
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lidforce/word-censor.git"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "start:dev": "ts-node --respawn src/index.ts",
